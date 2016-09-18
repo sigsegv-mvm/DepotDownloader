@@ -314,6 +314,7 @@ namespace DepotDownloader
             if (!steam3Credentials.IsValid)
             {
                 Console.WriteLine("Unable to get steam3 credentials.");
+                Environment.Exit(1);
                 return;
             }
         }
@@ -335,6 +336,7 @@ namespace DepotDownloader
             {
                 string contentName = GetAppOrDepotName(INVALID_DEPOT_ID, appId);
                 Console.WriteLine("App {0} ({1}) is not available from this account.", appId, contentName);
+                Environment.Exit(1);
                 return;
             }
 
@@ -379,6 +381,7 @@ namespace DepotDownloader
                 if (depotIDs == null || (depotIDs.Count == 0 && depotId == INVALID_DEPOT_ID))
                 {
                     Console.WriteLine("Couldn't find any depots to download for app {0}", appId);
+                    Environment.Exit(1);
                     return;
                 }
                 else if (depotIDs.Count == 0)
@@ -389,6 +392,7 @@ namespace DepotDownloader
                         Console.Write(" or not available on this platform");
                     }
                     Console.WriteLine();
+                    Environment.Exit(1);
                     return;
                 }
             }
@@ -411,6 +415,7 @@ namespace DepotDownloader
             catch (OperationCanceledException)
             {
                 Console.WriteLine("App {0} was not completely downloaded.", appId);
+                Environment.Exit(1);
             }
         }
 
@@ -424,6 +429,7 @@ namespace DepotDownloader
             if (!AccountHasAccess(depotId))
             {    
                 Console.WriteLine("Depot {0} ({1}) is not available from this account.", depotId, contentName);
+                Environment.Exit(1);
 
                 return null;
             }
@@ -434,6 +440,7 @@ namespace DepotDownloader
             if (!CreateDirectories(depotId, uVersion, out installDir))
             {
                 Console.WriteLine("Error: Unable to create install directories!");
+                Environment.Exit(1);
                 return null;
             }
 
@@ -444,6 +451,7 @@ namespace DepotDownloader
             if (manifestID == INVALID_MANIFEST_ID)
             {
                 Console.WriteLine("Depot {0} ({1}) missing public subsection or manifest section.", depotId, contentName);
+                Environment.Exit(1);
                 return null;
             }
 
@@ -451,6 +459,7 @@ namespace DepotDownloader
             if (!steam3.DepotKeys.ContainsKey(depotId))
             {
                 Console.WriteLine("No valid depot key for {0}, unable to download.", depotId);
+                Environment.Exit(1);
                 return null;
             }
 
@@ -539,7 +548,10 @@ namespace DepotDownloader
                     ConfigStore.TheConfig.ContentServerPenalty.TryGetValue(server.Host, out penalty);
                     ConfigStore.TheConfig.ContentServerPenalty[server.Host] = penalty + 1;
 
-                    Console.WriteLine("\nFailed to connect to content server {0}: {1}", server, ex.Message);
+                    if (!ex.Message.Contains("(403) Forbidden."))
+                    {
+                        Console.WriteLine("\nFailed to connect to content server {0}: {1}", server, ex.Message);
+                    }
                 }
             });
 
@@ -626,6 +638,7 @@ namespace DepotDownloader
                         if (depotManifest == null)
                         {
                             Console.WriteLine("\nUnable to download manifest {0} for depot {1}", depot.manifestId, depot.id);
+                            Environment.Exit(1);
                             return;
                         }
 
@@ -874,6 +887,7 @@ namespace DepotDownloader
                         if (chunkData == null)
                         {
                             Console.WriteLine("Failed to find any server with chunk {0} for depot {1}. Aborting.", chunkID, depot.id);
+                            Environment.Exit(1);
                             return;
                         }
 

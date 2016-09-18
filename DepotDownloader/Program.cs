@@ -14,6 +14,7 @@ namespace DepotDownloader
             if ( args.Length == 0 )
             {
                 PrintUsage();
+                Environment.Exit(1);
                 return;
             }
 
@@ -29,12 +30,14 @@ namespace DepotDownloader
             if ( appId == ContentDownloader.INVALID_APP_ID )
             {
                 Console.WriteLine( "Error: -app not specified!" );
+                Environment.Exit(1);
                 return;
             }
 
             if (depotId == ContentDownloader.INVALID_DEPOT_ID && ContentDownloader.Config.ManifestId != ContentDownloader.INVALID_MANIFEST_ID)
             {
                 Console.WriteLine("Error: -manifest requires -depot to be specified");
+                Environment.Exit(1);
                 return;
             }
 
@@ -82,6 +85,7 @@ namespace DepotDownloader
                 catch ( Exception ex )
                 {
                     Console.WriteLine( "Warning: Unable to load filelist: {0}", ex.ToString() );
+                    Environment.Exit(1);
                 }
             }
 
